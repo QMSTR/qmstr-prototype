@@ -35,7 +35,11 @@ func main() {
 	Info.Printf("quartermaster master process starting")
 	defer Info.Printf("quartermaster master process exiting")
 	if printVersion {
+		// --version prints the version and then exits:
 		fmt.Println("Quartermaster master 0.0.1")
 		return
 	}
+	// default: run the master server until a quit requests comes in
+	// TODO: also react to a SIGTERM/SIGKILL
+	Log.Printf(<-startHTTPServer())
 }
