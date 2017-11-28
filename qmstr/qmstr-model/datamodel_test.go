@@ -87,6 +87,6 @@ func TestCRUDTargetEntity(t *testing.T) {
 var dataModel *DataModel
 
 func TestMain(m *testing.M) {
-	dataModel = New()
+	dataModel = NewModel()
 	os.Exit(m.Run())
 }

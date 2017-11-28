@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	model "qmstr-prototype/qmstr/qmstr-model"
 
 	"github.com/spf13/pflag"
 )
@@ -15,6 +16,8 @@ var (
 	Info *log.Logger
 	// Log is the default logger.
 	Log *log.Logger
+	// Model is the data model managed by the master process.
+	Model *model.DataModel
 )
 
 func main() {
@@ -40,6 +43,7 @@ func main() {
 		return
 	}
 	// default: run the master server until a quit requests comes in
+	Model = model.NewModel()
 	// TODO: also react to a SIGTERM/SIGKILL
 	Log.Printf(<-startHTTPServer())
 }

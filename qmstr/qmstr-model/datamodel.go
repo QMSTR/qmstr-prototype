@@ -14,8 +14,8 @@ type DataModel struct {
 	targets      map[string]TargetEntity
 }
 
-// New creates a default-constructed DataModel.
-func New() *DataModel {
+// NewModel creates a default-constructed DataModel.
+func NewModel() *DataModel {
 	m := new(DataModel)
 	m.sources = make(map[string]SourceEntity)
 	m.dependencies = make(map[string]DependencyEntity)
