@@ -2,6 +2,7 @@ package analyze
 
 import (
 	"path/filepath"
+	model "qmstr-prototype/qmstr/qmstr-model"
 	"regexp"
 	"strings"
 )
@@ -148,4 +149,26 @@ func (a *GNUCAnalyzer) detectObjectFiles() *GNUCAnalyzer {
 		}
 	}
 	return a
+}
+
+func (a *GNUCAnalyzer) SendResults() {
+	client := model.NewClient("http://localhost:8080/")
+	for _, srcIdx := range a.sources {
+		var s model.SourceEntity
+		s.Path = a.args[srcIdx]
+		s.Hash = "filehash"
+		client.AddSourceEntity(s)
+	}
+	for _, target := range a.target {
+		var t model.TargetEntity
+		t.Name = target
+		t.Hash = "targethash"
+		client.AddTargetEntity(t)
+	}
+	for _, lib := range a.libs {
+		var d model.DependencyEntity
+		d.Name = lib
+		d.Hash = "dephash"
+		client.AddDependencyEntity(d)
+	}
 }

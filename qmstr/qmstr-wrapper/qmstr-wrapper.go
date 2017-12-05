@@ -51,6 +51,7 @@ func main() {
 	}
 
 	cA.Print()
+	cA.SendResults()
 }
 
 func findProg(prog string) (string, error) {
