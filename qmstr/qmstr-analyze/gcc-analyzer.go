@@ -30,18 +30,19 @@ var (
 )
 
 type GNUCAnalyzer struct {
-	args    []string
-	sources []int
-	target  []string
-	stash   []int
-	mode    mode
-	libs    []string
-	libPath []string
+	args             []string
+	sources          []int
+	target           []string
+	stash            []int
+	mode             mode
+	libs             []string
+	libPath          []string
+	givenTargetIndex int
 }
 
 // NewGNUCAnalyzer returns an initialized Analyzer to analyze gcc
 func NewGNUCAnalyzer(args []string) *GNUCAnalyzer {
-	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}}
+	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, -1}
 	return &a
 }
 
@@ -93,6 +94,7 @@ func (a *GNUCAnalyzer) detectTarget() {
 	for index, arg := range a.args {
 		if arg == "-o" {
 			a.target = append(a.target, a.args[index+1])
+			a.givenTargetIndex = len(a.target) - 1
 		}
 	}
 	if len(a.target) == 0 {
@@ -153,22 +155,41 @@ func (a *GNUCAnalyzer) detectObjectFiles() *GNUCAnalyzer {
 
 func (a *GNUCAnalyzer) SendResults() {
 	client := model.NewClient("http://localhost:8080/")
-	for _, srcIdx := range a.sources {
-		var s model.SourceEntity
-		s.Path = a.args[srcIdx]
-		s.Hash = "filehash"
-		client.AddSourceEntity(s)
-	}
-	for _, target := range a.target {
+	if a.mode == ASSEMBLE {
+		for idx, target := range a.target {
+			var t model.TargetEntity
+			t.Name = target
+			t.Hash = "targethash"
+
+			var s model.SourceEntity
+			s.Path = a.args[a.sources[idx]]
+			s.Hash = "filehash"
+			client.AddSourceEntity(s)
+
+			t.Sources = []string{s.ID()}
+			client.AddTargetEntity(t)
+		}
+	} else if a.mode == LINK {
 		var t model.TargetEntity
-		t.Name = target
-		t.Hash = "targethash"
+		t.Name = a.target[a.givenTargetIndex]
+		t.Hash = "linktargethash"
+
+		for _, srcIdx := range a.sources {
+			var s model.SourceEntity
+			s.Path = a.args[srcIdx]
+			s.Hash = "filehash"
+			client.AddSourceEntity(s)
+			t.Sources = append(t.Sources, s.ID())
+		}
+
+		for _, lib := range a.libs {
+			var d model.DependencyEntity
+			d.Name = lib
+			d.Hash = "dephash"
+			client.AddDependencyEntity(d)
+			t.Dependencies = append(t.Dependencies, d.ID())
+		}
 		client.AddTargetEntity(t)
 	}
-	for _, lib := range a.libs {
-		var d model.DependencyEntity
-		d.Name = lib
-		d.Hash = "dephash"
-		client.AddDependencyEntity(d)
-	}
+
 }

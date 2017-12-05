@@ -32,8 +32,10 @@ func (e *DependencyEntity) ID() string { return e.Name }
 
 // TargetEntity represents a target that is generated during the software build process.
 type TargetEntity struct {
-	Name string
-	Hash string
+	Name         string
+	Hash         string
+	Sources      []string
+	Dependencies []string
 }
 
 // ID for TargetEntity uses the name (for the moment).

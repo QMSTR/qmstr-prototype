@@ -98,7 +98,7 @@ func (m *DataModel) GetTargetEntity(id string) (TargetEntity, error) {
 	if value, ok := m.targets[id]; ok {
 		return value, nil
 	}
-	return TargetEntity{"", ""}, fmt.Errorf("target entity %s does not exist", id)
+	return TargetEntity{"", "", []string{}, []string{}}, fmt.Errorf("target entity %s does not exist", id)
 }
 
 // AddTargetEntity adds a target file to the model.
