@@ -83,11 +83,11 @@ func (c *Client) GetSourceEntity(id string) (SourceEntity, error) {
 	var result SourceEntity
 	body, err := c.performGetRequestWithID("sources", id, result)
 	if err != nil {
-		return SourceEntity{"", ""}, fmt.Errorf("error retrieving source entity \"%s\"", id)
+		return SourceEntity{"", "", []string{}}, fmt.Errorf("error retrieving source entity \"%s\"", id)
 	}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return SourceEntity{"", ""}, fmt.Errorf("error parsing source entity response")
+		return SourceEntity{"", "", []string{}}, fmt.Errorf("error parsing source entity response")
 	}
 	return result, nil
 }

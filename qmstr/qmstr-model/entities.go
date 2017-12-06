@@ -11,8 +11,9 @@ type Entity interface {
 
 // SourceEntity represents a source code file that becomes part of a target.
 type SourceEntity struct {
-	Path string
-	Hash string
+	Path     string
+	Hash     string
+	Licenses []string
 }
 
 // ID for SourceEntity uses the path (assuming it is the package local
