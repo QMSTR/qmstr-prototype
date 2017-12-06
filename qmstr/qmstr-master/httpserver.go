@@ -312,6 +312,21 @@ func handleTargetRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleReportRequest(w http.ResponseWriter, r *http.Request){
+	// create a report:
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleReportRequest: creating report...")
+	id := r.URL.Query().Get("id")
+	t, err := Model.GetTargetEntity(id)
+	if err != nil {
+		// no such entity, this is not a master server error, return an empty source entity
+		Info.Printf("handleReportRequest: %s - no such entity, returning an empty one", r.Method)
+		t = model.TargetEntity{Name: "", Hash: ""}
+	}
+	report := CreateReport(t)
+	w.Write(report)
+}
+
 func startHTTPServer() chan string {
 	address := ":8080"
 	server := &http.Server{Addr: address}
@@ -319,6 +334,7 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/sources", handleSourceRequest)
 	http.HandleFunc("/dependencies", handleDependencyRequest)
 	http.HandleFunc("/targets", handleTargetRequest)
+	http.HandleFunc("/report", handleReportRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)

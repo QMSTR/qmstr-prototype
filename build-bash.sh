@@ -15,3 +15,8 @@ fi
 # run the build
 ~/go/bin/qmstr-master &
 make -j5
+
+curl http://localhost:8080/report?id=bash
+
+curl http://localhost:8080/quit
+
