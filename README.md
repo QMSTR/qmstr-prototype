@@ -46,3 +46,14 @@ in bash. Some of the files compiled are generated during the
 build. Support for code generators will be added to Quartermaster in
 one of the upcoming sprints.
 
+## Docker
+
+You can build a Docker image with **qmstr** built into it with the provided `Dockerfile`.
+
+To build the image run `docker build -t qmstr .`
+from the repositories root path.
+
+After building the image you can run containers as follows:
+1. `docker run -v <some source path>:/build qmstr <build command>` to build some project in the container
+1. `docker run -v <qmstr source path>:/qmstr qmstr dev build` to compile qmstr in the container
+1. `docker run -v <qmstr source path>:/qmstr -v <some source path>:/build qmstr dev build <build command>` to compile qmstr in the container and subsequently build a project
