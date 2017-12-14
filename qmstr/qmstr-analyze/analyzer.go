@@ -24,7 +24,7 @@ func initLogging(debug bool) {
 	Logger = log.New(infoWriter, "", log.Ldate|log.Ltime)
 }
 
-func AnalyzeSourceFile(sourcefile string) []string {
+func analyzeSourceFile(sourcefile string) []string {
 	licenses := []string{}
 	cmd := exec.Command("ninka", "-i", sourcefile)
 	err := cmd.Start()

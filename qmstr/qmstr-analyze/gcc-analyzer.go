@@ -29,11 +29,11 @@ var (
 	linkLibPathPattern = regexp.MustCompile(`^-L\s*(\S+)\s*`)
 )
 
+// GNUCAnalyzer holds the analysis data
 type GNUCAnalyzer struct {
 	args             []string
 	sources          []int
 	target           []string
-	stash            []int
 	mode             mode
 	libs             []string
 	libPath          []string
@@ -43,10 +43,11 @@ type GNUCAnalyzer struct {
 // NewGNUCAnalyzer returns an initialized Analyzer to analyze gcc
 func NewGNUCAnalyzer(args []string, debug bool) *GNUCAnalyzer {
 	initLogging(debug)
-	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0}
+	a := GNUCAnalyzer{args, []int{}, []string{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0}
 	return &a
 }
 
+// Print will print the results of the command line analysis if in running in debug mode
 func (a *GNUCAnalyzer) Print() {
 	Logger.Printf("The source files are:")
 	for _, arg := range a.sources {
@@ -64,6 +65,7 @@ func (a *GNUCAnalyzer) Print() {
 	}
 }
 
+// Analyze will analyze the command line parameters and detect source files, targets and linked libraries.
 func (a *GNUCAnalyzer) Analyze(simulate bool) *GNUCAnalyzer {
 	a.extractMode()
 	a.detectSourceFiles()
@@ -151,6 +153,7 @@ func (a *GNUCAnalyzer) detectObjectFiles() {
 	}
 }
 
+// SendResults will transmit the results of the analysis to the master server
 func (a *GNUCAnalyzer) SendResults() {
 	client := model.NewClient("http://localhost:8080/")
 	if a.mode == ASSEMBLE {
@@ -162,7 +165,7 @@ func (a *GNUCAnalyzer) SendResults() {
 			var s model.SourceEntity
 			s.Path = a.args[a.sources[idx]]
 			s.Hash = "filehash"
-			s.Licenses = AnalyzeSourceFile(s.Path)
+			s.Licenses = analyzeSourceFile(s.Path)
 			client.AddSourceEntity(s)
 
 			t.Sources = []string{s.ID()}
@@ -190,5 +193,4 @@ func (a *GNUCAnalyzer) SendResults() {
 		}
 		client.AddTargetEntity(t)
 	}
-
 }
