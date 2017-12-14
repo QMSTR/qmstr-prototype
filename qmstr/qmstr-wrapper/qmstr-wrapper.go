@@ -19,7 +19,7 @@ func main() {
 	prog := commandLine[0]
 
 	if strings.HasSuffix(prog, "qmstr-wrapper") {
-		log.Fatal("This is not how you should invoke the qmstr-wrapper.\n\tSee https://github.com/endocode/qmstr-prototype for more information on how to use the QMSTR.")
+		log.Fatal("This is not how you should invoke the qmstr-wrapper.\n\tSee https://github.com/QMSTR/qmstr-prototype for more information on how to use the QMSTR.")
 	}
 
 	//extract the rest of the arguments
