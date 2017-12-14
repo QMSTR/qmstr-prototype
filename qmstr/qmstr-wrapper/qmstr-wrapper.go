@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -20,37 +22,41 @@ func main() {
 		log.Fatal("This is not how you should invoke the qmstr-wrapper.\n\tSee https://github.com/endocode/qmstr-prototype for more information on how to use the QMSTR.")
 	}
 
-	if len(commandLine) < 2 {
-		log.Fatal("Too few arguments")
-	}
 	//extract the rest of the arguments
 	commandLineArgs := commandLine[1:]
 
 	// run actual compiler
 	actualProg, err := findProg(prog)
 	checkErr(err)
-	log.Printf("Found %s at %s\n", prog, actualProg)
 	cmd := exec.Command(actualProg, commandLineArgs...)
-	err = cmd.Start()
-	checkErr(err)
+	var stdoutbuf, stderrbuf bytes.Buffer
+	cmd.Stdout = &stdoutbuf
+	cmd.Stderr = &stderrbuf
+
+	err = cmd.Run()
+	// preserve non-zero return code
+	if err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+				// preserve stderr
+				if stderr := stderrbuf.String(); len(stderr) > 0 {
+					fmt.Fprintf(os.Stderr, "%s", stderr)
+				}
+				os.Exit(status.ExitStatus())
+			}
+		} else {
+			log.Fatalf("Compiler failed with %v", err)
+		}
+	}
+
+	// preserve stdout
+	if stdout := stdoutbuf.String(); len(stdout) > 0 {
+		fmt.Fprintf(os.Stdout, "%s", stdout)
+	}
 
 	// detect analyzer and start analysis
 	cA := getAnalyzer(prog, commandLineArgs)
 	cA.Analyze(false)
-
-	// join actual compiler and preserve non-zero return code
-	if err := cmd.Wait(); err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
-			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				log.Printf("Exit Status: %d", status.ExitStatus())
-				os.Exit(status.ExitStatus())
-			}
-		} else {
-			log.Fatalf("cmd.Wait: %v", err)
-		}
-	}
-
-	cA.Print()
 	cA.SendResults()
 }
 
