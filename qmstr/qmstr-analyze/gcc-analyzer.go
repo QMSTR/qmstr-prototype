@@ -42,7 +42,7 @@ type GNUCAnalyzer struct {
 
 // NewGNUCAnalyzer returns an initialized Analyzer to analyze gcc
 func NewGNUCAnalyzer(args []string) *GNUCAnalyzer {
-	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, -1}
+	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0}
 	return &a
 }
 
