@@ -41,24 +41,25 @@ type GNUCAnalyzer struct {
 }
 
 // NewGNUCAnalyzer returns an initialized Analyzer to analyze gcc
-func NewGNUCAnalyzer(args []string) *GNUCAnalyzer {
+func NewGNUCAnalyzer(args []string, debug bool) *GNUCAnalyzer {
+	initLogging(debug)
 	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0}
 	return &a
 }
 
 func (a *GNUCAnalyzer) Print() {
-	Info.Printf("The source files are:")
+	Logger.Printf("The source files are:")
 	for _, arg := range a.sources {
-		Info.Printf(a.args[arg])
+		Logger.Printf(a.args[arg])
 	}
-	Info.Printf("The targets are:")
+	Logger.Printf("The targets are:")
 	for _, arg := range a.target {
-		Info.Printf(arg)
+		Logger.Printf(arg)
 	}
 	if a.mode == LINK {
-		Info.Printf("The libraries are:")
+		Logger.Printf("The libraries are:")
 		for _, arg := range a.libs {
-			Info.Printf(arg)
+			Logger.Printf(arg)
 		}
 	}
 }
