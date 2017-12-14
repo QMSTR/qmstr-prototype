@@ -115,8 +115,7 @@ func (a *GNUCAnalyzer) detectTarget() {
 	}
 }
 
-func (a *GNUCAnalyzer) detectSourceFiles() *GNUCAnalyzer {
-
+func (a *GNUCAnalyzer) detectSourceFiles() {
 	for index, arg := range a.args {
 		if extension := filepath.Ext(arg); extension != "" {
 			_, ok := sourceCodeExtensions[extension]
@@ -125,7 +124,6 @@ func (a *GNUCAnalyzer) detectSourceFiles() *GNUCAnalyzer {
 			}
 		}
 	}
-	return a
 }
 
 func (a *GNUCAnalyzer) extractLibs() {
@@ -142,7 +140,7 @@ func (a *GNUCAnalyzer) extractLibs() {
 	}
 }
 
-func (a *GNUCAnalyzer) detectObjectFiles() *GNUCAnalyzer {
+func (a *GNUCAnalyzer) detectObjectFiles() {
 	for index, arg := range a.args {
 		if extension := filepath.Ext(arg); extension == ".o" {
 			if a.args[index-1] != "-o" {
@@ -150,7 +148,6 @@ func (a *GNUCAnalyzer) detectObjectFiles() *GNUCAnalyzer {
 			}
 		}
 	}
-	return a
 }
 
 func (a *GNUCAnalyzer) SendResults() {
