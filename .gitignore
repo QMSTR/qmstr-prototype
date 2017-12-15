@@ -19,3 +19,10 @@
 # Vagrant
 .vagrant
 
+# IntelliJ IDEA
+**/.idea
+
+# Java classes and archives
+**/*.class
+**/*.jar
+
