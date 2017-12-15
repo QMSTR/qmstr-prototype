@@ -2,24 +2,29 @@ package analyze
 
 import (
 	"encoding/csv"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 )
 
 var (
-	// Info is the logger for INFO level output.
-	Info *log.Logger
-	// Log is the default logger.
-	Log *log.Logger
+	// Logger is the default logger.
+	Logger *log.Logger
 )
 
-func init() {
-	Log = log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
+func initLogging(debug bool) {
+	var infoWriter io.Writer
+	if debug {
+		infoWriter = os.Stdout
+	} else {
+		infoWriter = ioutil.Discard
+	}
+	Logger = log.New(infoWriter, "", log.Ldate|log.Ltime)
 }
 
-func AnalyzeSourceFile(sourcefile string) []string {
+func analyzeSourceFile(sourcefile string) []string {
 	licenses := []string{}
 	cmd := exec.Command("ninka", "-i", sourcefile)
 	err := cmd.Start()

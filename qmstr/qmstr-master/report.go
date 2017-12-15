@@ -13,6 +13,7 @@ type report struct {
 	License                        string
 }
 
+// CreateReport renders an SPDX document for the given TargetEntity
 func CreateReport(target model.TargetEntity) []byte {
 
 	//Define the template

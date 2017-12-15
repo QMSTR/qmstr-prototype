@@ -29,11 +29,11 @@ var (
 	linkLibPathPattern = regexp.MustCompile(`^-L\s*(\S+)\s*`)
 )
 
+// GNUCAnalyzer holds the analysis data
 type GNUCAnalyzer struct {
 	args             []string
 	sources          []int
 	target           []string
-	stash            []int
 	mode             mode
 	libs             []string
 	libPath          []string
@@ -41,28 +41,31 @@ type GNUCAnalyzer struct {
 }
 
 // NewGNUCAnalyzer returns an initialized Analyzer to analyze gcc
-func NewGNUCAnalyzer(args []string) *GNUCAnalyzer {
-	a := GNUCAnalyzer{args, []int{}, []string{}, []int{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, -1}
+func NewGNUCAnalyzer(args []string, debug bool) *GNUCAnalyzer {
+	initLogging(debug)
+	a := GNUCAnalyzer{args, []int{}, []string{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0}
 	return &a
 }
 
+// Print will print the results of the command line analysis if in running in debug mode
 func (a *GNUCAnalyzer) Print() {
-	Info.Printf("The source files are:")
+	Logger.Printf("The source files are:")
 	for _, arg := range a.sources {
-		Info.Printf(a.args[arg])
+		Logger.Printf(a.args[arg])
 	}
-	Info.Printf("The targets are:")
+	Logger.Printf("The targets are:")
 	for _, arg := range a.target {
-		Info.Printf(arg)
+		Logger.Printf(arg)
 	}
 	if a.mode == LINK {
-		Info.Printf("The libraries are:")
+		Logger.Printf("The libraries are:")
 		for _, arg := range a.libs {
-			Info.Printf(arg)
+			Logger.Printf(arg)
 		}
 	}
 }
 
+// Analyze will analyze the command line parameters and detect source files, targets and linked libraries.
 func (a *GNUCAnalyzer) Analyze(simulate bool) *GNUCAnalyzer {
 	a.extractMode()
 	a.detectSourceFiles()
@@ -115,8 +118,7 @@ func (a *GNUCAnalyzer) detectTarget() {
 	}
 }
 
-func (a *GNUCAnalyzer) detectSourceFiles() *GNUCAnalyzer {
-
+func (a *GNUCAnalyzer) detectSourceFiles() {
 	for index, arg := range a.args {
 		if extension := filepath.Ext(arg); extension != "" {
 			_, ok := sourceCodeExtensions[extension]
@@ -125,7 +127,6 @@ func (a *GNUCAnalyzer) detectSourceFiles() *GNUCAnalyzer {
 			}
 		}
 	}
-	return a
 }
 
 func (a *GNUCAnalyzer) extractLibs() {
@@ -142,7 +143,7 @@ func (a *GNUCAnalyzer) extractLibs() {
 	}
 }
 
-func (a *GNUCAnalyzer) detectObjectFiles() *GNUCAnalyzer {
+func (a *GNUCAnalyzer) detectObjectFiles() {
 	for index, arg := range a.args {
 		if extension := filepath.Ext(arg); extension == ".o" {
 			if a.args[index-1] != "-o" {
@@ -150,9 +151,9 @@ func (a *GNUCAnalyzer) detectObjectFiles() *GNUCAnalyzer {
 			}
 		}
 	}
-	return a
 }
 
+// SendResults will transmit the results of the analysis to the master server
 func (a *GNUCAnalyzer) SendResults() {
 	client := model.NewClient("http://localhost:8080/")
 	if a.mode == ASSEMBLE {
@@ -164,7 +165,7 @@ func (a *GNUCAnalyzer) SendResults() {
 			var s model.SourceEntity
 			s.Path = a.args[a.sources[idx]]
 			s.Hash = "filehash"
-			s.Licenses = AnalyzeSourceFile(s.Path)
+			s.Licenses = analyzeSourceFile(s.Path)
 			client.AddSourceEntity(s)
 
 			t.Sources = []string{s.ID()}
@@ -192,5 +193,4 @@ func (a *GNUCAnalyzer) SendResults() {
 		}
 		client.AddTargetEntity(t)
 	}
-
 }
