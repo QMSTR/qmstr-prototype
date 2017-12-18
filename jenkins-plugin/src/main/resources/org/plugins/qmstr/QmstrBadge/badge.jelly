@@ -1,0 +1,10 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <a id="link" href="javascript:void(0)" class="resMsg">
+        <t:summary icon="/plugin/jenkins-plugin/image/logo.png">
+        </t:summary>
+    </a>
+ 	<div id="promptMsg"  class="dlg" style="display:none;">
+    	Running with Quartermaster
+    </div>
+</j:jelly>
