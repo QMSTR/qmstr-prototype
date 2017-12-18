@@ -9,9 +9,17 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 @Extension
 public class QmstrReport extends Recorder {
@@ -28,7 +36,9 @@ public class QmstrReport extends Recorder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        JSONObject qmstrReport = getQmstrReport();
         build.addAction(new BuildReportAction());
+        build.addAction(new QmstrBadge());
         return true;
     }
 
@@ -59,5 +69,61 @@ public class QmstrReport extends Recorder {
             return "Generate reuse badge";
         }
 
+    }
+
+    public JSONObject getQmstrReport() {
+        URL url = null;
+        try {
+            url = new URL("http://localhost:8080");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        HttpURLConnection con = null;
+        try {
+            con = (HttpURLConnection) url.openConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            con.setRequestMethod("GET");
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        }
+        con.setRequestProperty("Content-Type", "application/json");
+
+        int status = 0;
+        try {
+            status = con.getResponseCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (status != 200) {
+            //TODO throw exception
+        }
+
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String inputLine;
+        StringBuffer content = new StringBuffer();
+        try {
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            in.close();
+            con.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return JSONObject.fromObject(content.toString());
     }
 }
