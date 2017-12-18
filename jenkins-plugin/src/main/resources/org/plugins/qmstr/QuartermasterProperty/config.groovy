@@ -1,6 +1,6 @@
-package org.plugins.qmstr.QuartermasterAction
+package org.plugins.qmstr.QuartermasterProperty
 
-import static org.plugins.qmstr.QuartermasterAction.DescriptorImpl.QMSTRQ_PROJECT_BLOCK_NAME
+import static org.plugins.qmstr.QuartermasterProperty.DescriptorImpl.QMSTRQ_PROJECT_BLOCK_NAME
 
 def f = namespace(lib.FormTagLib);
 
