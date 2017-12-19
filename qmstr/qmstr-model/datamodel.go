@@ -98,7 +98,18 @@ func (m *DataModel) GetTargetEntity(id string) (TargetEntity, error) {
 	if value, ok := m.targets[id]; ok {
 		return value, nil
 	}
-	return TargetEntity{"", "", []string{}, []string{}}, fmt.Errorf("target entity %s does not exist", id)
+	return TargetEntity{"", "", []string{}, []string{}, false}, fmt.Errorf("target entity %s does not exist", id)
+}
+
+// GetAllLinkedTargets retrieves all target entity from the model.
+func (m *DataModel) GetAllLinkedTargets() []string {
+	targets := []string{}
+	for _, target := range m.targets {
+		if target.Linked {
+			targets = append(targets, target.Name)
+		}
+	}
+	return targets
 }
 
 // AddTargetEntity adds a target file to the model.
