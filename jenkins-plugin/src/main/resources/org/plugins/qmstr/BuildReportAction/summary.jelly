@@ -1,8 +1,8 @@
+
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
- 	<t:summary icon="/plugin/jenkins-plugin/image/reuse.png">
- 	<pre>
- 		${it.msg}
- 	</pre>
- 	</t:summary>
+    <link rel="stylesheet" href="${resURL}/plugin/jenkins-plugin/css/style.css"/>
+        <div class="reuseC" >
+            <img src="${rootURL}/plugin/jenkins-plugin/image/reuse-compliant.svg"/>
+        </div>
 </j:jelly>
