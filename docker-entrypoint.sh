@@ -10,6 +10,8 @@ function build(){
         qmstr-master &
     fi
     export PATH=/qmstr-wrapper:$PATH
+    export CC=/qmstr-wrapper/gcc
+    export CXX=/qmstr-wrapper/g++
     exec "$@"
 }
 

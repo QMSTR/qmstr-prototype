@@ -9,7 +9,8 @@ RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:gophers/archive && \
     apt-get update && \
-    apt-get install -y golang-1.9-go autoconf git libio-captureoutput-perl
+    apt-get install -y golang-1.9-go autoconf git libio-captureoutput-perl \
+    libtool cmake curl libz-dev libssl-dev
 
 # install ninka
 RUN mkdir /ninka && \
