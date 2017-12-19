@@ -330,7 +330,7 @@ func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleHealthRequest: reporting on heath status...")
 	// For now no real check is done; Just tell that we are running.
-	w.Write("{ "running": "ok" }")
+	w.Write([]byte("{ \"running\": \"ok\" }"))
 }
 
 func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
@@ -345,6 +345,37 @@ func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("{}"))
 	}
 }
+
+func handleDumpRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleDumpRequest: dump data model...")
+	dumpModel := "{ \"sources\": %s, \"targets\": %s, \"dependencies\": %s }"
+	srcs := ""
+	targets := ""
+	deps := ""
+
+	b, err := json.Marshal(Model.GetAllSourceEntities())
+	if err == nil {
+		srcs = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	b, err = json.Marshal(Model.GetAllTargetEntities())
+	if err == nil {
+		targets = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	b, err = json.Marshal(Model.GetAllTargetEntities())
+	if err == nil {
+		deps = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	w.Write([]byte(fmt.Sprintf(dumpModel, srcs, targets, deps)))
 }
 
 func startHTTPServer() chan string {
@@ -356,6 +387,7 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/targets", handleTargetRequest)
 	http.HandleFunc("/report", handleReportRequest)
 	http.HandleFunc("/health", handleHealthRequest)
+	http.HandleFunc("/dump", handleDumpRequest)
 	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
