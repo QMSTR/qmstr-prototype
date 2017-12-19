@@ -37,6 +37,7 @@ type TargetEntity struct {
 	Hash         string
 	Sources      []string
 	Dependencies []string
+	Linked       bool
 }
 
 // ID for TargetEntity uses the name (for the moment).

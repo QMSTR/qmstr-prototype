@@ -333,6 +333,20 @@ func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
 	w.Write("{ "running": "ok" }")
 }
 
+func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleLinkedTargetsRequest: return linked targets...")
+
+	b, err := json.Marshal(Model.GetAllLinkedTargets())
+	if err == nil {
+		w.Write(b)
+	} else {
+		Info.Printf("Error: %v", err)
+		w.Write([]byte("{}"))
+	}
+}
+}
+
 func startHTTPServer() chan string {
 	address := ":8080"
 	server := &http.Server{Addr: address}
@@ -342,6 +356,7 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/targets", handleTargetRequest)
 	http.HandleFunc("/report", handleReportRequest)
 	http.HandleFunc("/health", handleHealthRequest)
+	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)
