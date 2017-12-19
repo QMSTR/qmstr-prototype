@@ -32,7 +32,7 @@ see an SPDX output like this:
 
 `PackageName:  bash`
 
-`PackageLicenseDeclared: NONE AND GPLv3+ AND GPLv3+ BisonException`
+`PackageLicenseDeclared: NONE AND GPLv3+ AND GPLv3+,BisonException`
 
 * SPDXVersion: The version of the spec used, normally "SPDX-2.0".
 * DataLicense: The license for the license data itself, normally this
