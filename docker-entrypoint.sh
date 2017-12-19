@@ -4,8 +4,14 @@ set -e
 function build(){
     echo "Building project"
     cd "${QMSTR_BUILD_DIR}"
-    qmstr-master &
-    PATH=/qmstr-wrapper:$PATH
+    if [ $QMSTR_DEBUG = "true" ]; then
+        qmstr-master -v &
+    else
+        qmstr-master &
+    fi
+    export PATH=/qmstr-wrapper:$PATH
+    export CC=/qmstr-wrapper/gcc
+    export CXX=/qmstr-wrapper/g++
     exec "$@"
 }
 

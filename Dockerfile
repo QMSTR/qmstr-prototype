@@ -9,7 +9,8 @@ RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:gophers/archive && \
     apt-get update && \
-    apt-get install -y golang-1.9-go autoconf git libio-captureoutput-perl
+    apt-get install -y golang-1.9-go autoconf git libio-captureoutput-perl \
+    libtool cmake curl libz-dev libssl-dev
 
 # install ninka
 RUN mkdir /ninka && \
@@ -36,10 +37,11 @@ VOLUME [ "/qmstr" ]
 RUN mkdir -p ${QMSTR_BUILD_DIR}
 VOLUME [ "${QMSTR_BUILD_DIR}" ]
 RUN mkdir /qmstr-wrapper && \
-    for i in {gcc,g++}; do ln -s /go/bin/qmstr-wrapper /qmstr-wrapper/${i}; done 
+    for i in gcc g++; do ln -s /go/bin/qmstr-wrapper /qmstr-wrapper/${i}; done
 
 WORKDIR ${QMSTR_BUILD_DIR}
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY helper-funcs.sh /helper-funcs.sh
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT [ "/docker-entrypoint.sh" ]

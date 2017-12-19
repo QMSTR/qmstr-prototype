@@ -312,8 +312,7 @@ func handleTargetRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleReportRequest(w http.ResponseWriter, r *http.Request){
-	// create a report:
+func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleReportRequest: creating report...")
 	id := r.URL.Query().Get("id")
@@ -327,6 +326,58 @@ func handleReportRequest(w http.ResponseWriter, r *http.Request){
 	w.Write(report)
 }
 
+func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleHealthRequest: reporting on heath status...")
+	// For now no real check is done; Just tell that we are running.
+	w.Write([]byte("{ \"running\": \"ok\" }"))
+}
+
+func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleLinkedTargetsRequest: return linked targets...")
+
+	b, err := json.Marshal(Model.GetAllLinkedTargets())
+	if err == nil {
+		w.Write(b)
+	} else {
+		Info.Printf("Error: %v", err)
+		w.Write([]byte("{}"))
+	}
+}
+
+func handleDumpRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleDumpRequest: dump data model...")
+	dumpModel := "{ \"sources\": %s, \"targets\": %s, \"dependencies\": %s }"
+	srcs := ""
+	targets := ""
+	deps := ""
+
+	b, err := json.Marshal(Model.GetAllSourceEntities())
+	if err == nil {
+		srcs = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	b, err = json.Marshal(Model.GetAllTargetEntities())
+	if err == nil {
+		targets = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	b, err = json.Marshal(Model.GetAllTargetEntities())
+	if err == nil {
+		deps = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	w.Write([]byte(fmt.Sprintf(dumpModel, srcs, targets, deps)))
+}
+
 func startHTTPServer() chan string {
 	address := ":8080"
 	server := &http.Server{Addr: address}
@@ -335,6 +386,9 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/dependencies", handleDependencyRequest)
 	http.HandleFunc("/targets", handleTargetRequest)
 	http.HandleFunc("/report", handleReportRequest)
+	http.HandleFunc("/health", handleHealthRequest)
+	http.HandleFunc("/dump", handleDumpRequest)
+	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)

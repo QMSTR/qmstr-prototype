@@ -161,6 +161,7 @@ func (a *GNUCAnalyzer) SendResults() {
 			var t model.TargetEntity
 			t.Name = target
 			t.Hash = "targethash"
+			t.Linked = false
 
 			var s model.SourceEntity
 			s.Path = a.args[a.sources[idx]]
@@ -175,6 +176,7 @@ func (a *GNUCAnalyzer) SendResults() {
 		var t model.TargetEntity
 		t.Name = a.target[a.givenTargetIndex]
 		t.Hash = "linktargethash"
+		t.Linked = true
 
 		for _, srcIdx := range a.sources {
 			var s model.SourceEntity
