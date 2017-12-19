@@ -74,7 +74,7 @@ public class QmstrReport extends Recorder {
     public JSONObject getQmstrReport() {
         URL url = null;
         try {
-            url = new URL("http://localhost:8080");
+            url = new URL("http://localhost:8080/sources?id=foobar");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -99,7 +99,7 @@ public class QmstrReport extends Recorder {
         }
 
         if (status != 200) {
-            //TODO throw exception
+            throw new NullPointerException();
         }
 
         BufferedReader in = null;
