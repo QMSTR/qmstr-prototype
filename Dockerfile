@@ -36,7 +36,7 @@ VOLUME [ "/qmstr" ]
 RUN mkdir -p ${QMSTR_BUILD_DIR}
 VOLUME [ "${QMSTR_BUILD_DIR}" ]
 RUN mkdir /qmstr-wrapper && \
-    for i in {gcc,g++}; do ln -s /go/bin/qmstr-wrapper /qmstr-wrapper/${i}; done 
+    for i in gcc g++; do ln -s /go/bin/qmstr-wrapper /qmstr-wrapper/${i}; done
 
 WORKDIR ${QMSTR_BUILD_DIR}
 

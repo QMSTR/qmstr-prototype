@@ -312,8 +312,7 @@ func handleTargetRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleReportRequest(w http.ResponseWriter, r *http.Request){
-	// create a report:
+func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleReportRequest: creating report...")
 	id := r.URL.Query().Get("id")

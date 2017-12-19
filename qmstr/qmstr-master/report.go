@@ -33,7 +33,7 @@ PackageLicenseDeclared: {{.License}}
 	b := bytes.Buffer{}
 	err := r.Execute(&b, report)
 	if err != nil {
-		log.Println("executing template:", err)
+		log.Println("Failed to render report template:", err)
 	}
 	return b.Bytes()
 }
