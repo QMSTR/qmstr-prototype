@@ -41,5 +41,6 @@ RUN mkdir /qmstr-wrapper && \
 WORKDIR ${QMSTR_BUILD_DIR}
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY helper-funcs.sh /helper-funcs.sh
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
