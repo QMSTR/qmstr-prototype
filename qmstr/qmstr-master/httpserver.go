@@ -326,6 +326,13 @@ func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 	w.Write(report)
 }
 
+func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleHealthRequest: reporting on heath status...")
+	// For now no real check is done; Just tell that we are running.
+	w.Write("{ "running": "ok" }")
+}
+
 func startHTTPServer() chan string {
 	address := ":8080"
 	server := &http.Server{Addr: address}
@@ -334,6 +341,7 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/dependencies", handleDependencyRequest)
 	http.HandleFunc("/targets", handleTargetRequest)
 	http.HandleFunc("/report", handleReportRequest)
+	http.HandleFunc("/health", handleHealthRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)
