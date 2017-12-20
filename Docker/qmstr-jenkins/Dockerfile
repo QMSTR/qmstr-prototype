@@ -3,7 +3,7 @@ USER root
 
 RUN apt-get update && \
     apt-get install -y autoconf git libio-captureoutput-perl \
-    libtool cmake wget tar build-essential
+    libtool cmake wget tar build-essential maven
 #curl libz-dev libssl-dev
 
 RUN cd /tmp && wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz && tar -xvf go1.9.2.linux-amd64.tar.gz && mv go/ /usr/local
@@ -23,15 +23,19 @@ RUN mkdir /ninka && \
 # setup qmstr build env
 RUN mkdir -p /go/src/qmstr-prototype && \
     mkdir /qmstr && \
-    git clone https://github.com/QMSTR/qmstr-prototype.git /qmstr && \
+    git clone -b wip/sprint_2 https://github.com/endocode/qmstr-prototype-fork.git /qmstr && \
     ln -s /qmstr/qmstr /go/src/qmstr-prototype/qmstr
 
 # build and install qmstr
 RUN go get qmstr-prototype/qmstr/qmstr-master && \
     go install qmstr-prototype/qmstr/qmstr-master && \
-    go install qmstr-prototype/qmstr/qmstr-wrapper && \
-    rm -fr /qmstr/*
+    go install qmstr-prototype/qmstr/qmstr-wrapper
+
+RUN cd /qmstr/jenkins-plugin && mvn package && cp target/jenkins-plugin.hpi $JENKINS_HOME/plugins/
+
+RUN rm -fr /qmstr/*
 RUN mkdir /qmstr-wrapper && \
     for i in gcc g++; do ln -s /go/bin/qmstr-wrapper /qmstr-wrapper/${i}; done
+
 
 USER jenkins
