@@ -323,7 +323,7 @@ func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 		t = model.TargetEntity{Name: "", Hash: ""}
 	}
 	report := CreateReport(t)
-	result := fmt.Sprintf("{ \"report\": %s }", report)
+	result := fmt.Sprintf("{ \"report\": \"%s\" }", report)
 	w.Write([]byte(result))
 }
 
