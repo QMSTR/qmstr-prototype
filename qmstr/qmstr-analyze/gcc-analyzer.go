@@ -155,12 +155,13 @@ func (a *GNUCAnalyzer) detectObjectFiles() {
 
 // SendResults will transmit the results of the analysis to the master server
 func (a *GNUCAnalyzer) SendResults() {
-	client := model.NewClient("http://localhost:8080/")
+	client := model.NewClient("http://localhost:9000/")
 	if a.mode == ASSEMBLE {
 		for idx, target := range a.target {
 			var t model.TargetEntity
 			t.Name = target
 			t.Hash = "targethash"
+			t.Linked = false
 
 			var s model.SourceEntity
 			s.Path = a.args[a.sources[idx]]
@@ -175,6 +176,7 @@ func (a *GNUCAnalyzer) SendResults() {
 		var t model.TargetEntity
 		t.Name = a.target[a.givenTargetIndex]
 		t.Hash = "linktargethash"
+		t.Linked = true
 
 		for _, srcIdx := range a.sources {
 			var s model.SourceEntity

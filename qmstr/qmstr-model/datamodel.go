@@ -98,7 +98,45 @@ func (m *DataModel) GetTargetEntity(id string) (TargetEntity, error) {
 	if value, ok := m.targets[id]; ok {
 		return value, nil
 	}
-	return TargetEntity{"", "", []string{}, []string{}}, fmt.Errorf("target entity %s does not exist", id)
+	return TargetEntity{"", "", []string{}, []string{}, false}, fmt.Errorf("target entity %s does not exist", id)
+}
+
+// GetAllTargetEntities retrieves all target entities from the model.
+func (m *DataModel) GetAllTargetEntities() []TargetEntity {
+	targets := []TargetEntity{}
+	for _, target := range m.targets {
+		targets = append(targets, target)
+	}
+	return targets
+}
+
+// GetAllSourceEntities retrieves all target entities from the model.
+func (m *DataModel) GetAllSourceEntities() []SourceEntity {
+	srcs := []SourceEntity{}
+	for _, src := range m.sources {
+		srcs = append(srcs, src)
+	}
+	return srcs
+}
+
+// GetAllDependencyEntities retrieves all dependency entities from the model.
+func (m *DataModel) GetAllDependencyEntities() []DependencyEntity {
+	deps := []DependencyEntity{}
+	for _, dep := range m.dependencies {
+		deps = append(deps, dep)
+	}
+	return deps
+}
+
+// GetAllLinkedTargets retrieves all target entity from the model.
+func (m *DataModel) GetAllLinkedTargets() []string {
+	targets := []string{}
+	for _, target := range m.targets {
+		if target.Linked {
+			targets = append(targets, target.Name)
+		}
+	}
+	return targets
 }
 
 // AddTargetEntity adds a target file to the model.

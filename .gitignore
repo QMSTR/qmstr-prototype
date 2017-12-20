@@ -21,8 +21,12 @@
 
 # IntelliJ IDEA
 **/.idea
+**/*.iml
 
 # Java classes and archives
 **/*.class
 **/*.jar
 
+**/.DS_Store
+jenkins-plugin/work/
+jenkins-plugin/target/

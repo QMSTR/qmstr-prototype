@@ -312,8 +312,7 @@ func handleTargetRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleReportRequest(w http.ResponseWriter, r *http.Request){
-	// create a report:
+func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleReportRequest: creating report...")
 	id := r.URL.Query().Get("id")
@@ -324,17 +323,79 @@ func handleReportRequest(w http.ResponseWriter, r *http.Request){
 		t = model.TargetEntity{Name: "", Hash: ""}
 	}
 	report := CreateReport(t)
-	w.Write(report)
+	result := fmt.Sprintf("{ \"report\": %s }", report)
+	w.Write([]byte(result))
+}
+
+func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleHealthRequest: reporting on heath status...")
+	// For now no real check is done; Just tell that we are running.
+	w.Write([]byte("{ \"running\": \"ok\" }"))
+}
+
+func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleLinkedTargetsRequest: return linked targets...")
+
+	b, err := json.Marshal(Model.GetAllLinkedTargets())
+	if err == nil {
+		result := fmt.Sprintf("{ \"linkedtargets\" : %s}", string(b))
+		w.Write([]byte(result))
+	} else {
+		Info.Printf("Error: %v", err)
+		w.Write([]byte("{}"))
+	}
+}
+
+func handleDumpRequest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	Info.Printf("handleDumpRequest: dump data model...")
+	dumpModel := "{ \"sources\": %s, \"targets\": %s, \"dependencies\": %s }"
+	srcs := ""
+	targets := ""
+	deps := ""
+
+	b, err := json.Marshal(Model.GetAllSourceEntities())
+	if err == nil {
+		srcs = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	b, err = json.Marshal(Model.GetAllTargetEntities())
+	if err == nil {
+		targets = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	b, err = json.Marshal(Model.GetAllTargetEntities())
+	if err == nil {
+		deps = string(b)
+	} else {
+		Info.Printf("Error: %v", err)
+	}
+
+	w.Write([]byte(fmt.Sprintf(dumpModel, srcs, targets, deps)))
+}
+
+func handleReuseRequest(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("{ \"reuse compliant\": \"ok\" }"))
 }
 
 func startHTTPServer() chan string {
-	address := ":8080"
+	address := ":9000"
 	server := &http.Server{Addr: address}
 	http.HandleFunc("/quit", handleQuitRequest)
 	http.HandleFunc("/sources", handleSourceRequest)
 	http.HandleFunc("/dependencies", handleDependencyRequest)
 	http.HandleFunc("/targets", handleTargetRequest)
 	http.HandleFunc("/report", handleReportRequest)
+	http.HandleFunc("/health", handleHealthRequest)
+	http.HandleFunc("/dump", handleDumpRequest)
+	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
+	http.HandleFunc("/reuse", handleReuseRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)
