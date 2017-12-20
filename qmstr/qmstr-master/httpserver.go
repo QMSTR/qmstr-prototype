@@ -323,7 +323,8 @@ func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 		t = model.TargetEntity{Name: "", Hash: ""}
 	}
 	report := CreateReport(t)
-	w.Write(report)
+	result := fmt.Sprintf("{ \"report\": %s }", report)
+	w.Write([]byte(result))
 }
 
 func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
@@ -337,7 +338,8 @@ func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleLinkedTargetsRequest: return linked targets...")
 
-	b, err := json.Marshal(Model.GetAllLinkedTargets())
+	result := fmt.Sprintf("{ \"linkedtargets\" : %v}", Model.GetAllLinkedTargets())
+	b, err := json.Marshal(result)
 	if err == nil {
 		w.Write(b)
 	} else {

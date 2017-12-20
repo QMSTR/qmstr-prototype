@@ -14,7 +14,7 @@ type report struct {
 }
 
 // CreateReport renders an SPDX document for the given TargetEntity
-func CreateReport(target model.TargetEntity) []byte {
+func CreateReport(target model.TargetEntity) string {
 
 	//Define the template
 	const reportTemplate = `
@@ -35,7 +35,7 @@ PackageLicenseDeclared: {{.License}}
 	if err != nil {
 		log.Println("Failed to render report template:", err)
 	}
-	return b.Bytes()
+	return b.String()
 }
 
 func extractLicenses(sources []string) []string {
