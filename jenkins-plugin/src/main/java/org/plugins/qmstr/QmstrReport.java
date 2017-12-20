@@ -9,6 +9,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -20,6 +21,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 @Extension
 public class QmstrReport extends Recorder {
@@ -36,8 +39,15 @@ public class QmstrReport extends Recorder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        JSONObject qmstrReport = getQmstrReport();
-        build.addAction(new BuildReportAction());
+        JSONObject qmstrlinkedtargets = getQmstrReport("linkedtargets");
+        JSONArray linkedtargetsArray = qmstrlinkedtargets.getJSONArray("linkedtargets");
+        Map<String, String> map = new HashMap();
+        for (int i=0; i< linkedtargetsArray.size(); i++){
+            String targetName = linkedtargetsArray.get(i).toString();
+            JSONObject reporttargetNameSpecific  = getQmstrReport("report?id=" + targetName);
+            map.put(targetName, reporttargetNameSpecific.getString("report"));
+        }
+        build.addAction(new BuildReportAction(map));
         build.addAction(new QmstrBadge());
         return true;
     }
@@ -71,10 +81,10 @@ public class QmstrReport extends Recorder {
 
     }
 
-    public JSONObject getQmstrReport() {
+    public JSONObject getQmstrReport(String endpoint) {
         URL url = null;
         try {
-            url = new URL("http://localhost:8080/sources?id=foobar");
+            url = new URL("http://localhost:9000/" + endpoint);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -99,7 +109,7 @@ public class QmstrReport extends Recorder {
         }
 
         if (status != 200) {
-            throw new NullPointerException();
+            throw new NullPointerException("Status " + status);
         }
 
         BufferedReader in = null;

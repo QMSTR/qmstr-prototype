@@ -5,4 +5,5 @@
         <div class="reuseC" >
             <img src="${rootURL}/plugin/jenkins-plugin/image/reuse-compliant.svg"/>
         </div>
+        <pre>${it.msg}</pre>
 </j:jelly>

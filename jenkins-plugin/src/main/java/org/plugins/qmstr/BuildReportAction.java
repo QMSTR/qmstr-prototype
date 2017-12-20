@@ -3,6 +3,7 @@ package org.plugins.qmstr;
 import hudson.Extension;
 import hudson.model.InvisibleAction;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -11,12 +12,20 @@ import java.util.logging.Logger;
 @Extension
 public class BuildReportAction extends InvisibleAction {
 
+    public BuildReportAction(){}
 
     private String msg;
     private static final Logger LOGGER = Logger.getLogger(BuildReportAction.class.getName());
 
-    public BuildReportAction() {
-        this.msg = "Hello you";
+    public BuildReportAction(Map<String, String> report) {
+        StringBuilder stb = new StringBuilder();
+        for (Map.Entry<String,String> entry : report.entrySet()) {
+            stb.append(entry.getKey());
+            stb.append("\n\n");
+            stb.append(entry.getValue());
+            stb.append("\n\n");
+        }
+        msg = stb.toString();
         LOGGER.info("BuildReportAction running");
     }
 

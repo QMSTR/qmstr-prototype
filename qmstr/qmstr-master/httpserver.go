@@ -385,7 +385,7 @@ func handleReuseRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func startHTTPServer() chan string {
-	address := ":8080"
+	address := ":9000"
 	server := &http.Server{Addr: address}
 	http.HandleFunc("/quit", handleQuitRequest)
 	http.HandleFunc("/sources", handleSourceRequest)

@@ -3,7 +3,7 @@
       <link rel="stylesheet" href="${resURL}/plugin/jenkins-plugin/css/style.css"/>
         <t:summary icon="/plugin/jenkins-plugin/image/logo.png" >
             <div class="qmstr">
-                <pre>${%RESULT}</pre>
+                <pre>${it.status}</pre>
             </div>
         </t:summary>
 </j:jelly>
