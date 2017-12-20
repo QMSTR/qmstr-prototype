@@ -338,10 +338,10 @@ func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleLinkedTargetsRequest: return linked targets...")
 
-	result := fmt.Sprintf("{ \"linkedtargets\" : %v}", Model.GetAllLinkedTargets())
-	b, err := json.Marshal(result)
+	b, err := json.Marshal(Model.GetAllLinkedTargets())
 	if err == nil {
-		w.Write(b)
+		result := fmt.Sprintf("{ \"linkedtargets\" : %s}", string(b))
+		w.Write([]byte(result))
 	} else {
 		Info.Printf("Error: %v", err)
 		w.Write([]byte("{}"))
