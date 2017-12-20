@@ -380,6 +380,10 @@ func handleDumpRequest(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf(dumpModel, srcs, targets, deps)))
 }
 
+func handleReuseRequest(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("{ \"reuse compliant\": \"ok\" }"))
+}
+
 func startHTTPServer() chan string {
 	address := ":8080"
 	server := &http.Server{Addr: address}
@@ -391,6 +395,7 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/health", handleHealthRequest)
 	http.HandleFunc("/dump", handleDumpRequest)
 	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
+	http.HandleFunc("/reuse", handleReuseRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)
