@@ -32,7 +32,7 @@ RUN go get qmstr-prototype/qmstr/qmstr-master && \
     go install qmstr-prototype/qmstr/qmstr-wrapper
 
 # build plugin
-RUN cd /qmstr/jenkins-plugin && mvn package
+#RUN cd /qmstr/jenkins-plugin && mvn package
 
 RUN rm -fr /qmstr/*
 RUN mkdir /qmstr-wrapper && \
