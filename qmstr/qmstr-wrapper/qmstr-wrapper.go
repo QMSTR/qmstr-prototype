@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	analyze "qmstr-prototype/qmstr/qmstr-analyze"
 	util "qmstr-prototype/qmstr/qmstr-util"
-	"strings"
 	"syscall"
 )
 
@@ -46,9 +45,9 @@ func main() {
 	commandLine := os.Args
 	logger.Printf("QMSTR called via %v", commandLine)
 	//extract the compiler
-	prog := commandLine[0]
+	prog := filepath.Base(commandLine[0])
 
-	if strings.HasSuffix(prog, "qmstr-wrapper") {
+	if prog == "qmstr-wrapper" {
 		log.Fatal("This is not how you should invoke the qmstr-wrapper.\n\tSee https://github.com/QMSTR/qmstr-prototype for more information on how to use the QMSTR.")
 	}
 
@@ -106,7 +105,7 @@ func findProg(prog string) (string, error) {
 			foundUs = true
 		}
 	}
-	return "", errors.New("executable file not found in $PATH")
+	return "", errors.New(fmt.Sprintf("executable file %s not found in $PATH", prog))
 }
 
 func findExecutable(file string) error {
