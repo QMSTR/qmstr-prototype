@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	model "qmstr-prototype/qmstr/qmstr-model"
+	util "qmstr-prototype/qmstr/qmstr-util"
 )
 
 var closeServer chan interface{}
@@ -384,6 +385,23 @@ func handleReuseRequest(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("{ \"reuse compliant\": \"ok\" }"))
 }
 
+func handleLogRequest(w http.ResponseWriter, r *http.Request) {
+	Info.Printf("handleLogRequest: processing a %s request", r.Method)
+	var log util.LogMessage
+	switch r.Method {
+	case "POST":
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&log)
+		if err != nil {
+			Info.Printf("handleLogRequest: %s - error parsing request body", r.Method)
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		Info.Printf("REMOTE: %s", log.Msg)
+	}
+}
+
 func startHTTPServer() chan string {
 	address := ":9000"
 	server := &http.Server{Addr: address}
@@ -396,6 +414,7 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/dump", handleDumpRequest)
 	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
 	http.HandleFunc("/reuse", handleReuseRequest)
+	http.HandleFunc("/log", handleLogRequest)
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)
