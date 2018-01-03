@@ -12,6 +12,7 @@ function build(){
     export PATH=/qmstr-wrapper:$PATH
     export CC=/qmstr-wrapper/gcc
     export CXX=/qmstr-wrapper/g++
+    export CMAKE_LINKER=gcc
     exec "$@"
 }
 
@@ -19,9 +20,8 @@ if [ "$1" = 'dev' ]; then
     if [ "$2" = 'build' ]; then
         echo "Building QMSTR"
         shift 2
-        go get qmstr-prototype/qmstr/qmstr-master
-        go install qmstr-prototype/qmstr/qmstr-master
-        go install qmstr-prototype/qmstr/qmstr-wrapper
+        source /helper-funcs.sh
+        build_qmstr
     fi
 fi
 
