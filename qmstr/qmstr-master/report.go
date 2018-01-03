@@ -20,7 +20,7 @@ func CreateReport(target model.TargetEntity) string {
 	const reportTemplate = `
 SPDXVersion: {{.SPDXVersion}}
 DataLicense: {{.DataLicense}}
-PackageName:  {{.Name}}
+PackageName: {{.Name}}
 PackageLicenseDeclared: {{.License}}
 `
 	//Create a new template and parse the data
