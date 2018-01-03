@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	analyze "qmstr-prototype/qmstr/qmstr-analyze"
+	util "qmstr-prototype/qmstr/qmstr-util"
 	"strings"
 	"syscall"
 )
@@ -25,17 +26,20 @@ var (
 
 func init() {
 	// setup logging
-	if os.Getenv(debugEnv) == "true" {
-		debug = true
-	}
 	var infoWriter io.Writer
-	if debug {
+	debugMode := os.Getenv(debugEnv)
+	switch debugMode {
+	case "stdout":
 		infoWriter = os.Stdout
-	} else {
+	case "remote":
+		infoWriter = util.NewHTTPRemoteLogger("localhost", 9000, "log")
+	default:
 		infoWriter = ioutil.Discard
 	}
 	logger = log.New(infoWriter, "", log.Ldate|log.Ltime)
-	logger.Print("Additional debug output enabled. This might break your build!")
+	if debugMode == "stdout" {
+		logger.Print("Debug output on stdout enabled. This might break your build!")
+	}
 }
 
 func main() {

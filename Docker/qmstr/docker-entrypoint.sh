@@ -4,7 +4,7 @@ set -e
 function build(){
     echo "Building project"
     cd "${QMSTR_BUILD_DIR}"
-    if [ $QMSTR_DEBUG = "true" ]; then
+    if [ ! -z "$QMSTR_DEBUG" ]; then
         qmstr-master -v &
     else
         qmstr-master &
