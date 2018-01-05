@@ -8,7 +8,7 @@ import (
 )
 
 func TestCRUDSourceEntity(t *testing.T) {
-	source := SourceEntity{"a/b/source.c", "1234567890"}
+	source := SourceEntity{"a/b/source.c", "1234567890", []string{"GPL-3.0"}}
 	//make sure the value is not in the model:
 	if value, err := dataModel.GetSourceEntity(source.ID()); err != nil {
 		dataModel.DeleteSourceEntity(value)
@@ -34,7 +34,7 @@ func TestCRUDSourceEntity(t *testing.T) {
 }
 
 func TestCRUDDependencyEntity(t *testing.T) {
-	dependency := DependencyEntity{"/usr/lib/libc.so", "1234567890"}
+	dependency := DependencyEntity{[]*TargetEntity{}, "/usr/lib/libc.so", "1234567890"}
 	//make sure the value is not in the model:
 	if value, err := dataModel.GetDependencyEntity(dependency.ID()); err != nil {
 		dataModel.DeleteDependencyEntity(value)
@@ -59,7 +59,7 @@ func TestCRUDDependencyEntity(t *testing.T) {
 	require.Equal(t, "", value3.ID())
 }
 func TestCRUDTargetEntity(t *testing.T) {
-	target := TargetEntity{"bin/application", "1234567890"}
+	target := TargetEntity{"bin/application", "1234567890", "", nil, nil, true}
 	//make sure the value is not in the model:
 	if value, err := dataModel.GetTargetEntity(target.ID()); err != nil {
 		dataModel.DeleteTargetEntity(value)

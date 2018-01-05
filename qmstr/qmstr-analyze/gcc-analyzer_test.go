@@ -7,7 +7,7 @@ import (
 func TestGCCAnalyzerArguments(t *testing.T) {
 	args := []string{"-c", "array.c", "-o", "array.o"}
 	// create a Canalyzer struct with the arguments
-	analyzer := NewGNUCAnalyzer(args)
+	analyzer := NewGNUCAnalyzer(args, false)
 	analyzer.Analyze(true)
 
 	//check if qmstr filled the struct with the correct values
@@ -24,7 +24,7 @@ func TestGCCAnalyzerArguments(t *testing.T) {
 func TestGCCAnalyzerWithoutTarget(t *testing.T) {
 	args := []string{"-c", "array.c"}
 	// create a Canalyzer struct with the arguments
-	analyzer := NewGNUCAnalyzer(args)
+	analyzer := NewGNUCAnalyzer(args, false)
 	analyzer.Analyze(true)
 
 	//check if qmstr filled the struct with the correct values
@@ -41,7 +41,7 @@ func TestGCCAnalyzerWithoutTarget(t *testing.T) {
 func TestGCCAnalyzerLinkWithoutTarget(t *testing.T) {
 	args := []string{"array.c"}
 	// create a Canalyzer struct with the arguments
-	analyzer := NewGNUCAnalyzer(args)
+	analyzer := NewGNUCAnalyzer(args, false)
 	analyzer.Analyze(true)
 
 	//check if qmstr filled the struct with the correct values
@@ -58,7 +58,7 @@ func TestGCCAnalyzerLinkWithoutTarget(t *testing.T) {
 func TestGCCAnalyzerMultiSourceArguments(t *testing.T) {
 	args := []string{"array.c", "foo.c", "bar.c", "-o", "theprogram"}
 	// create a Canalyzer struct with the arguments
-	analyzer := NewGNUCAnalyzer(args)
+	analyzer := NewGNUCAnalyzer(args, false)
 	analyzer.Analyze(true)
 
 	//check if qmstr filled the struct with the correct values
