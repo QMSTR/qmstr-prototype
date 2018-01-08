@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -44,6 +43,7 @@ func init() {
 func main() {
 	commandLine := os.Args
 	logger.Printf("QMSTR called via %v", commandLine)
+
 	//extract the compiler
 	prog := filepath.Base(commandLine[0])
 
@@ -105,7 +105,7 @@ func findProg(prog string) (string, error) {
 			foundUs = true
 		}
 	}
-	return "", errors.New(fmt.Sprintf("executable file %s not found in $PATH", prog))
+	return "", fmt.Errorf("executable file %s not found in $PATH", prog)
 }
 
 func findExecutable(file string) error {
