@@ -349,7 +349,7 @@ func (c *Client) GetTargetEntity(id string) (TargetEntity, error) {
 	}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return TargetEntity{"", "", []string{}, []string{}, false}, fmt.Errorf("error parsing entity response")
+		return TargetEntity{"", "", []string{}, []string{}, false, ""}, fmt.Errorf("error parsing entity response")
 	}
 	return result, nil
 }

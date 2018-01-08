@@ -38,6 +38,7 @@ type TargetEntity struct {
 	Sources      []string
 	Dependencies []string
 	Linked       bool
+	Path         string
 }
 
 // ID for TargetEntity uses the name (for the moment).

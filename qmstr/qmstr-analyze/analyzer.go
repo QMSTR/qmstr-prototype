@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 var (
@@ -52,4 +53,18 @@ func checkErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func buildCleanPath(base string, subpath string) string {
+	if filepath.IsAbs(subpath) {
+		return filepath.Clean(subpath)
+	}
+
+	if !filepath.IsAbs(base) {
+		var err error
+		base, err = filepath.Abs(base)
+		checkErr(err)
+	}
+	tmpPath := filepath.Join(base, subpath)
+	return filepath.Clean(tmpPath)
 }

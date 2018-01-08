@@ -51,6 +51,11 @@ func main() {
 		log.Fatal("This is not how you should invoke the qmstr-wrapper.\n\tSee https://github.com/QMSTR/qmstr-prototype for more information on how to use the QMSTR.")
 	}
 
+	workingDir, err := os.Getwd()
+	if err != nil {
+		logger.Fatal("Could not get current working dir.")
+	}
+
 	//extract the rest of the arguments
 	commandLineArgs := commandLine[1:]
 	// run actual compiler
@@ -83,7 +88,7 @@ func main() {
 	}
 
 	// detect analyzer and start analysis
-	cA := getAnalyzer(prog, commandLineArgs, debug)
+	cA := getAnalyzer(prog, commandLineArgs, workingDir, debug)
 	cA.Analyze(false)
 	cA.Print()
 	cA.SendResults()
@@ -120,10 +125,10 @@ func findExecutable(file string) error {
 }
 
 //return a more generic type
-func getAnalyzer(program string, args []string, debug bool) *analyze.GNUCAnalyzer {
+func getAnalyzer(program string, args []string, workingDir string, debug bool) *analyze.GNUCAnalyzer {
 	switch program {
 	case "g++", "gcc":
-		return analyze.NewGNUCAnalyzer(args, debug)
+		return analyze.NewGNUCAnalyzer(args, workingDir, debug)
 	default:
 		log.Fatal("Compiler not supported")
 	}

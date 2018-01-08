@@ -98,7 +98,16 @@ func (m *DataModel) GetTargetEntity(id string) (TargetEntity, error) {
 	if value, ok := m.targets[id]; ok {
 		return value, nil
 	}
-	return TargetEntity{"", "", []string{}, []string{}, false}, fmt.Errorf("target entity %s does not exist", id)
+	return TargetEntity{"", "", []string{}, []string{}, false, ""}, fmt.Errorf("target entity %s does not exist", id)
+}
+
+func (m *DataModel) GetTargetEntityByPath(path string) (*TargetEntity, error) {
+	for _, target := range m.targets {
+		if target.Path == path {
+			return &target, nil
+		}
+	}
+	return nil, nil
 }
 
 // GetAllTargetEntities retrieves all target entities from the model.

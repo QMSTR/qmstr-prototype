@@ -38,12 +38,13 @@ type GNUCAnalyzer struct {
 	libs             []string
 	libPath          []string
 	givenTargetIndex int
+	workingDir       string
 }
 
 // NewGNUCAnalyzer returns an initialized Analyzer to analyze gcc
-func NewGNUCAnalyzer(args []string, debug bool) *GNUCAnalyzer {
+func NewGNUCAnalyzer(args []string, workingDir string, debug bool) *GNUCAnalyzer {
 	initLogging(debug)
-	a := GNUCAnalyzer{args, []int{}, []string{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0}
+	a := GNUCAnalyzer{args, []int{}, []string{}, LINK, []string{}, []string{"/usr/lib", "/usr/lib32", "/usr/lib64"}, 0, workingDir}
 	return &a
 }
 
@@ -162,9 +163,10 @@ func (a *GNUCAnalyzer) SendResults() {
 			t.Name = target
 			t.Hash = "targethash"
 			t.Linked = false
+			t.Path = buildCleanPath(a.workingDir, t.Name)
 
 			var s model.SourceEntity
-			s.Path = a.args[a.sources[idx]]
+			s.Path = buildCleanPath(a.workingDir, a.args[a.sources[idx]])
 			s.Hash = "filehash"
 			s.Licenses = analyzeSourceFile(s.Path)
 			client.AddSourceEntity(s)
@@ -177,10 +179,11 @@ func (a *GNUCAnalyzer) SendResults() {
 		t.Name = a.target[a.givenTargetIndex]
 		t.Hash = "linktargethash"
 		t.Linked = true
+		t.Path = buildCleanPath(a.workingDir, t.Name)
 
 		for _, srcIdx := range a.sources {
 			var s model.SourceEntity
-			s.Path = a.args[srcIdx]
+			s.Path = buildCleanPath(a.workingDir, a.args[srcIdx])
 			s.Hash = "filehash"
 			client.AddSourceEntity(s)
 			t.Sources = append(t.Sources, s.ID())
