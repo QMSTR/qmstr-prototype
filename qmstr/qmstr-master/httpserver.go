@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
+	analysis "qmstr-prototype/qmstr/qmstr-analysis"
 	model "qmstr-prototype/qmstr/qmstr-model"
 	util "qmstr-prototype/qmstr/qmstr-util"
 )
 
 var closeServer chan interface{}
+var analyzers []analysis.Analyzer
 
 func handleQuitRequest(w http.ResponseWriter, r *http.Request) {
 	// nothing to do except quit:
@@ -54,6 +57,15 @@ func handleSourceRequest(w http.ResponseWriter, r *http.Request) {
 			//strange:
 			s.Path = id
 		}
+		// FIXME evil hack to circumvent shotcomings of our model
+		if filepath.Ext(s.GetFile()) != ".o" {
+			// call analyzers
+			Info.Printf("Starting analysis ")
+			for _, ana := range analyzers {
+				Info.Printf("%s running", ana.GetName())
+				ana.Analyze(&s)
+			}
+		}
 		err = Model.AddSourceEntity(s)
 		if err != nil {
 			Info.Printf("handleSourceRequest: %s - error adding source entity: %s", r.Method, err.Error())
@@ -62,6 +74,7 @@ func handleSourceRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		Info.Printf("handleSourceRequest: %s - done", r.Method)
+
 		// else: done
 	case "DELETE":
 		id := r.URL.Query().Get("id")
@@ -415,6 +428,8 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
 	http.HandleFunc("/reuse", handleReuseRequest)
 	http.HandleFunc("/log", handleLogRequest)
+
+	analyzers = []analysis.Analyzer{analysis.NewNinkjaAnalyzer()}
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)

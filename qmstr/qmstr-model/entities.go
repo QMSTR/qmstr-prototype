@@ -22,6 +22,17 @@ func (e *SourceEntity) ID() string {
 	return e.Path
 }
 
+func (e *SourceEntity) StoreResult(result map[string]interface{}) error {
+	if lics, ok := result["licenses"]; ok {
+		e.Licenses = lics.([]string)
+	}
+	return nil
+}
+
+func (e *SourceEntity) GetFile() string {
+	return e.Path
+}
+
 // DependencyEntity represents a dependency for a target.
 type DependencyEntity struct {
 	Name string

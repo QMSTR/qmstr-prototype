@@ -168,7 +168,6 @@ func (a *GNUCAnalyzer) SendResults() {
 			var s model.SourceEntity
 			s.Path = buildCleanPath(a.workingDir, a.args[a.sources[idx]])
 			s.Hash = "filehash"
-			s.Licenses = analyzeSourceFile(s.Path)
 			client.AddSourceEntity(s)
 
 			t.Sources = []string{s.ID()}

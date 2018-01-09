@@ -41,6 +41,7 @@ func extractLicenses(sources []string) []string {
 			return []string{}
 		}
 		if s.Licenses == nil || len(s.Licenses) == 0 {
+			// Find corresponding target entity
 			t, err := Model.GetTargetEntityByPath(v)
 			if err != nil {
 				return []string{}
