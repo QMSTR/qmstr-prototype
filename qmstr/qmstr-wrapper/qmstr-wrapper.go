@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,9 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	analyze "qmstr-prototype/qmstr/qmstr-analyze"
+	analyze "qmstr-prototype/qmstr/qmstr-compiler"
 	util "qmstr-prototype/qmstr/qmstr-util"
-	"strings"
 	"syscall"
 )
 
@@ -45,11 +43,17 @@ func init() {
 func main() {
 	commandLine := os.Args
 	logger.Printf("QMSTR called via %v", commandLine)
-	//extract the compiler
-	prog := commandLine[0]
 
-	if strings.HasSuffix(prog, "qmstr-wrapper") {
+	//extract the compiler
+	prog := filepath.Base(commandLine[0])
+
+	if prog == "qmstr-wrapper" {
 		log.Fatal("This is not how you should invoke the qmstr-wrapper.\n\tSee https://github.com/QMSTR/qmstr-prototype for more information on how to use the QMSTR.")
+	}
+
+	workingDir, err := os.Getwd()
+	if err != nil {
+		logger.Fatal("Could not get current working dir.")
 	}
 
 	//extract the rest of the arguments
@@ -84,7 +88,7 @@ func main() {
 	}
 
 	// detect analyzer and start analysis
-	cA := getAnalyzer(prog, commandLineArgs, debug)
+	cA := getAnalyzer(prog, commandLineArgs, workingDir, debug)
 	cA.Analyze(false)
 	cA.Print()
 	cA.SendResults()
@@ -106,7 +110,7 @@ func findProg(prog string) (string, error) {
 			foundUs = true
 		}
 	}
-	return "", errors.New("executable file not found in $PATH")
+	return "", fmt.Errorf("executable file %s not found in $PATH", prog)
 }
 
 func findExecutable(file string) error {
@@ -121,10 +125,10 @@ func findExecutable(file string) error {
 }
 
 //return a more generic type
-func getAnalyzer(program string, args []string, debug bool) *analyze.GNUCAnalyzer {
+func getAnalyzer(program string, args []string, workingDir string, debug bool) *analyze.GNUCAnalyzer {
 	switch program {
 	case "g++", "gcc":
-		return analyze.NewGNUCAnalyzer(args, debug)
+		return analyze.NewGNUCAnalyzer(args, workingDir, debug)
 	default:
 		log.Fatal("Compiler not supported")
 	}

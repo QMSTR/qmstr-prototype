@@ -2,10 +2,10 @@ package model
 
 import "fmt"
 
-/* DataModel implements a m odel of entities that are stored in
+/* DataModel implements a model of entities that are stored in
 /* different buckets. Relations between the entities are resolved
 /* programmatically for the moment. Long-term, the implementation
-/* behind the daat model will be a graph database. */
+/* behind the data model will be a graph database. */
 
 // DataModel implements the project structure model from sources, dependencies and targets.
 type DataModel struct {
@@ -98,7 +98,16 @@ func (m *DataModel) GetTargetEntity(id string) (TargetEntity, error) {
 	if value, ok := m.targets[id]; ok {
 		return value, nil
 	}
-	return TargetEntity{"", "", []string{}, []string{}, false}, fmt.Errorf("target entity %s does not exist", id)
+	return TargetEntity{"", "", []string{}, []string{}, false, ""}, fmt.Errorf("target entity %s does not exist", id)
+}
+
+func (m *DataModel) GetTargetEntityByPath(path string) (*TargetEntity, error) {
+	for _, target := range m.targets {
+		if target.Path == path {
+			return &target, nil
+		}
+	}
+	return nil, nil
 }
 
 // GetAllTargetEntities retrieves all target entities from the model.

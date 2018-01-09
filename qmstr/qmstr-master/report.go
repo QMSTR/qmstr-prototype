@@ -17,12 +17,7 @@ type report struct {
 func CreateReport(target model.TargetEntity) string {
 
 	//Define the template
-	const reportTemplate = `
-SPDXVersion: {{.SPDXVersion}}
-DataLicense: {{.DataLicense}}
-PackageName:  {{.Name}}
-PackageLicenseDeclared: {{.License}}
-`
+	const reportTemplate = "SPDXVersion: {{.SPDXVersion}}\\nDataLicense: {{.DataLicense}}\\nPackageName: {{.Name}}\\nPackageLicenseDeclared: {{.License}}"
 	//Create a new template and parse the data
 	r := template.Must(template.New("report").Parse(reportTemplate))
 
@@ -46,7 +41,8 @@ func extractLicenses(sources []string) []string {
 			return []string{}
 		}
 		if s.Licenses == nil || len(s.Licenses) == 0 {
-			t, err := Model.GetTargetEntity(v)
+			// Find corresponding target entity
+			t, err := Model.GetTargetEntityByPath(v)
 			if err != nil {
 				return []string{}
 			}

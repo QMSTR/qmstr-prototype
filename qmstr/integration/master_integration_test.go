@@ -95,7 +95,7 @@ var MasterAddress string
 
 func TestMain(m *testing.M) {
 	// masterAddress := os.Getenv("QMSTR_MASTER_ADDRESS")
-	masterAddress := "http://localhost:8080"
+	masterAddress := "http://localhost:9000"
 	if _, _, _, err := model.ParseMasterAddress(masterAddress); err != nil {
 		panic(err)
 	}
