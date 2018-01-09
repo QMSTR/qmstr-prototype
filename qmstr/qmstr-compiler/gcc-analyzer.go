@@ -1,4 +1,4 @@
-package analyze
+package compiler_analyzer
 
 import (
 	"path/filepath"

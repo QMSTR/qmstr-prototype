@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	analyze "qmstr-prototype/qmstr/qmstr-analyze"
+	analyze "qmstr-prototype/qmstr/qmstr-compiler"
 	util "qmstr-prototype/qmstr/qmstr-util"
 	"syscall"
 )
