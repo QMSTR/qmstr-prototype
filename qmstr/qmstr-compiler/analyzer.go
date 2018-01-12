@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	util "qmstr-prototype/qmstr/qmstr-util"
 )
 
 var (
@@ -13,14 +14,21 @@ var (
 	Logger *log.Logger
 )
 
-func initLogging(debug bool) {
+func initLogging(debugMode string) {
+	// setup logging
 	var infoWriter io.Writer
-	if debug {
+	switch debugMode {
+	case "stdout":
 		infoWriter = os.Stdout
-	} else {
+	case "remote":
+		infoWriter = util.NewHTTPRemoteLogger("localhost", 9000, "log")
+	default:
 		infoWriter = ioutil.Discard
 	}
 	Logger = log.New(infoWriter, "", log.Ldate|log.Ltime)
+	if debugMode == "stdout" {
+		Logger.Print("Debug output on stdout enabled. This might break your build!")
+	}
 }
 
 func checkErr(err error) {

@@ -18,14 +18,14 @@ const debugEnv string = "QMSTR_DEBUG"
 
 var (
 	// Log is the default logger.
-	logger *log.Logger
-	debug  bool
+	logger    *log.Logger
+	debugMode string
 )
 
 func init() {
 	// setup logging
 	var infoWriter io.Writer
-	debugMode := os.Getenv(debugEnv)
+	debugMode = os.Getenv(debugEnv)
 	switch debugMode {
 	case "stdout":
 		infoWriter = os.Stdout
@@ -88,7 +88,7 @@ func main() {
 	}
 
 	// detect analyzer and start analysis
-	cA := getAnalyzer(prog, commandLineArgs, workingDir, debug)
+	cA := getAnalyzer(prog, commandLineArgs, workingDir, debugMode)
 	cA.Analyze(false)
 	cA.Print()
 	cA.SendResults()
@@ -125,7 +125,7 @@ func findExecutable(file string) error {
 }
 
 //return a more generic type
-func getAnalyzer(program string, args []string, workingDir string, debug bool) *analyze.GNUCAnalyzer {
+func getAnalyzer(program string, args []string, workingDir string, debug string) *analyze.GNUCAnalyzer {
 	switch program {
 	case "g++", "gcc":
 		return analyze.NewGNUCAnalyzer(args, workingDir, debug)
