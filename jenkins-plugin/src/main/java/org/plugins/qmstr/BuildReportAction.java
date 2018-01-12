@@ -18,13 +18,16 @@ public class BuildReportAction extends InvisibleAction {
     private static final Logger LOGGER = Logger.getLogger(BuildReportAction.class.getName());
 
     public BuildReportAction(Map<String, String> report) {
+
         StringBuilder stb = new StringBuilder();
+
         for (Map.Entry<String,String> entry : report.entrySet()) {
             stb.append(entry.getKey());
             stb.append("\n\n");
             stb.append(entry.getValue());
             stb.append("\n\n");
         }
+
         msg = stb.toString();
         LOGGER.info("BuildReportAction running");
     }

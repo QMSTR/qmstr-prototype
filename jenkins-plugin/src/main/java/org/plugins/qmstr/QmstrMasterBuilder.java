@@ -37,12 +37,18 @@ public class QmstrMasterBuilder extends Builder {
         QuartermasterProperty prop = build.getProject().getProperty(QuartermasterProperty.class);
         String pathToQMstrMaster;
         Process process;
+
         if (prop != null){
             pathToQMstrMaster = prop.getPath();
         } else {
             return false;
         }
+
         process = Runtime.getRuntime().exec(pathToQMstrMaster);
+        
+        // Check if the master is actually running first
+        build.addAction(new QmstrBadge());
+        
         return true;
     }
 

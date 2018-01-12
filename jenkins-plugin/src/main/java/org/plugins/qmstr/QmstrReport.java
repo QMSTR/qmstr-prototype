@@ -13,6 +13,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.plugins.qmstr.QmstrHttpClient.QmstrHttpClientExeption;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,16 +40,27 @@ public class QmstrReport extends Recorder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        JSONObject qmstrlinkedtargets = getQmstrReport("linkedtargets");
-        JSONArray linkedtargetsArray = qmstrlinkedtargets.getJSONArray("linkedtargets");
+
+        QmstrHttpClient qmstr = new QmstrHttpClient("http://localhost:9000");
+
+        JSONObject linkedTargets = qmstr.linkedTargets();
+        if (linkedTargets == null) {
+            return false;
+        }
+
+        JSONArray linkedtargetsArray = linkedTargets.getJSONArray("linkedtargets");
+
         Map<String, String> map = new HashMap();
         for (int i=0; i< linkedtargetsArray.size(); i++){
+
             String targetName = linkedtargetsArray.get(i).toString();
-            JSONObject reporttargetNameSpecific  = getQmstrReport("report?id=" + targetName);
+            JSONObject reporttargetNameSpecific  = qmstr.report(targetName);
+
             map.put(targetName, reporttargetNameSpecific.getString("report"));
         }
+
         build.addAction(new BuildReportAction(map));
-        build.addAction(new QmstrBadge());
+        
         return true;
     }
 
@@ -79,61 +91,5 @@ public class QmstrReport extends Recorder {
             return "Generate reuse badge";
         }
 
-    }
-
-    public JSONObject getQmstrReport(String endpoint) {
-        URL url = null;
-        try {
-            url = new URL("http://localhost:9000/" + endpoint);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        HttpURLConnection con = null;
-        try {
-            con = (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            con.setRequestMethod("GET");
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        }
-        con.setRequestProperty("Content-Type", "application/json");
-
-        int status = 0;
-        try {
-            status = con.getResponseCode();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (status != 200) {
-            throw new NullPointerException("Status " + status);
-        }
-
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String inputLine;
-        StringBuffer content = new StringBuffer();
-        try {
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            in.close();
-            con.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return JSONObject.fromObject(content.toString());
     }
 }
