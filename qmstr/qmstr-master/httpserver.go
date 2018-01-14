@@ -13,6 +13,10 @@ import (
 
 var closeServer chan interface{}
 var analyzers []analysis.Analyzer
+var workdir string
+var scanChannel chan interface{}
+var scancodeResult interface{}
+var scanned bool
 
 func handleQuitRequest(w http.ResponseWriter, r *http.Request) {
 	// nothing to do except quit:
@@ -62,6 +66,9 @@ func handleSourceRequest(w http.ResponseWriter, r *http.Request) {
 			// call analyzers
 			Info.Printf("Starting analysis ")
 			for _, ana := range analyzers {
+				configData := make(map[string]interface{})
+				configData["scancode"] = scancodeResult
+				ana.Configure(configData)
 				Info.Printf("%s running", ana.GetName())
 				ana.Analyze(&s)
 			}
@@ -344,8 +351,15 @@ func handleReportRequest(w http.ResponseWriter, r *http.Request) {
 func handleHealthRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	Info.Printf("handleHealthRequest: reporting on heath status...")
-	// For now no real check is done; Just tell that we are running.
-	w.Write([]byte("{ \"running\": \"ok\" }"))
+	select {
+	case msg := <-scanChannel:
+		Info.Println("received message")
+		scancodeResult = msg
+		scanned = true
+	default:
+		Info.Println("no message received")
+	}
+	w.Write([]byte(fmt.Sprintf("{ \"running\": \"ok\", \"scanned\": %v }", scanned)))
 }
 
 func handleLinkedTargetsRequest(w http.ResponseWriter, r *http.Request) {
@@ -415,6 +429,25 @@ func handleLogRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleConfigRequest(w http.ResponseWriter, r *http.Request) {
+	Info.Printf("handleConfigRequest: processing a %s request", r.Method)
+	switch r.Method {
+	case "POST":
+		var config util.Configuration
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&config)
+		if err != nil {
+			Info.Printf("handleConfigRequest: %s - error parsing request body", r.Method)
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		if config.Workdir != "" {
+			go util.ScanDir(config.Workdir, scanChannel)
+		}
+	}
+}
+
 func startHTTPServer() chan string {
 	address := ":9000"
 	server := &http.Server{Addr: address}
@@ -428,8 +461,11 @@ func startHTTPServer() chan string {
 	http.HandleFunc("/linkedtargets", handleLinkedTargetsRequest)
 	http.HandleFunc("/reuse", handleReuseRequest)
 	http.HandleFunc("/log", handleLogRequest)
+	http.HandleFunc("/config", handleConfigRequest)
 
-	analyzers = []analysis.Analyzer{analysis.NewNinkjaAnalyzer()}
+	analyzers = []analysis.Analyzer{analysis.NewNinkjaAnalyzer(), &analysis.PrescanScanCodeAnalyzer{}}
+	scanChannel = make(chan interface{})
+	scanned = false
 
 	Info.Printf("starting HTTP server on address %s", address)
 	channel := make(chan string)
