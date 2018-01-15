@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:17.10
 
 ENV PATH /go/bin:/usr/lib/go-1.9/bin:$PATH
 ENV GOPATH /go
@@ -10,7 +10,7 @@ RUN apt-get update && \
     add-apt-repository ppa:gophers/archive && \
     apt-get update && \
     apt-get install -y golang-1.9-go autoconf git libio-captureoutput-perl \
-    libtool cmake curl libz-dev libssl-dev
+    libtool cmake curl libz-dev libssl-dev python python-pip
 
 # install ninka
 RUN mkdir /ninka && \
@@ -19,6 +19,9 @@ RUN mkdir /ninka && \
     rm /usr/local/man/man1 && \
     cd /ninka && perl Makefile.PL && make && make install && \
     rm -fr /ninka
+
+# install scancode
+RUN pip install scancode-toolkit
 
 # setup qmstr build env
 RUN mkdir -p /go/src/qmstr-prototype && \

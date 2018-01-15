@@ -30,6 +30,14 @@ function report(){
     curl http://localhost:9000/report?id=$1
 }
 
+function config_qmstr(){
+    curl --data "{\"workdir\": \"/build\"}" http://localhost:9000/config
+}
+
+function health(){
+    curl http://localhost:9000/health
+}
+
 function build_cmake(){
     cd /build
     rm -fr build

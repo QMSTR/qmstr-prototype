@@ -6,6 +6,7 @@ type Analyzable interface {
 }
 
 type Analyzer interface {
+	Configure(data map[string]interface{}) error
 	GetName() string
 	Analyze(aw Analyzable) error
 }

@@ -70,3 +70,7 @@ func (na *NinkaAnalyzer) Analyze(a Analyzable) error {
 
 	return nil
 }
+
+func (na *NinkaAnalyzer) Configure(data map[string]interface{}) error {
+	return nil
+}
